@@ -22,4 +22,6 @@ public class PlayerinputComponent : InputComponentBase
     {
         return GetInputDirection().normalized;
     }
+
+    
 }

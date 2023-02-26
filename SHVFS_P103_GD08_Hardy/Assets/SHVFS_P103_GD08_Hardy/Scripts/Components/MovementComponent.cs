@@ -1,4 +1,5 @@
-﻿using UnityEditor.ShaderGraph;
+﻿using System.Linq;
+using UnityEditor.ShaderGraph;
 using UnityEngine;
 
 public class MovementComponent : MonoBehaviour
@@ -25,6 +26,8 @@ public class MovementComponent : MonoBehaviour
     private float movementDistance => player_speed * Time.deltaTime;
     private void Update()
     {
+
+
         /*movementDirection = new Vector3(PlayerinputComponent.GetInputDirectionNormalized().x, 0f, PlayerinputComponent.GetInputDirectionNormalized().y).normalized;
         Vector3 fwd = movementDirection;
         Physics.Raycast(transform.position, fwd, out fwdhit, 1);
@@ -70,8 +73,8 @@ public class MovementComponent : MonoBehaviour
         //TODO Refactor, make DRY, solve issue with colliding being blocked by ball..
         //var canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerWidth, movementDirection, movementDistance);
 
-        
-        
+
+
         //if(canMove)
         //{
         //    var targetPosition = transform.position + player_speed * movementDirection * Time.deltaTime;
@@ -79,7 +82,7 @@ public class MovementComponent : MonoBehaviour
         //    return;
         //}
 
-        if(TryMove(movementDirection))return;
+        if (TryMove(movementDirection)) return;
 
         if (TryMove(new Vector3(movementDirection.x, 0f, 0f).normalized)) return;
 
@@ -103,27 +106,50 @@ public class MovementComponent : MonoBehaviour
         //    var targetPosition = transform.position + player_speed * movementDirectionZ * Time.deltaTime;
         //    transform.position = targetPosition;
         //}
-
-
+        
 
 
     }
 
     private bool TryMove(Vector3 direction)
     {
-        RaycastHit hit;
-        if (!Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerWidth, direction,out hit, movementDistance)|| hit.collider.GetComponent<Rigidbody>())
+        var hits = Physics.CapsuleCastAll(transform.position, transform.position + Vector3.up * playerHeight, playerWidth, direction, movementDistance);
+
+        //Limit nesting it makes it hard to follow what's going on 
+        if (hits.Length >= 1)
         {
-            var targetPosition = transform.position + player_speed * direction * Time.deltaTime;
-            transform.position = targetPosition;
+            if (hits.All(hit => hit.transform.GetComponent<StructureComponent>() == null))
+
+                Move(direction);
+                
             return true;
+
+            return false;
         }
-       
-        return false;
+        //if (!Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerWidth, direction,out hit, movementDistance)|| hit.collider.GetComponent<Rigidbody>())
+        //{
+        //    var targetPosition = transform.position + player_speed * direction * Time.deltaTime;
+        //    transform.position = targetPosition;
+        //    return true;
+        //}
+
+        //return false;
+        Move(direction);
+        return true;
+    }
+
+    private void Move(Vector3 direction)
+    {
+        var targetPosition = transform.position + player_speed * direction * Time.deltaTime;
+        transform.position = targetPosition;
     }
 
     
-       
-
-
 }
+
+    
+    
+        
+    
+
+
