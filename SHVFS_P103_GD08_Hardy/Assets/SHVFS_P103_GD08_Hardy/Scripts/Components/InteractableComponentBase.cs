@@ -4,5 +4,6 @@ using UnityEngine;
 
 public abstract class InteractableComponentBase : MonoBehaviour
 {
-    public abstract void Interact();
+    public abstract int Priority { get; }
+    public abstract bool Interact(InteractorComponent interactor);
 }

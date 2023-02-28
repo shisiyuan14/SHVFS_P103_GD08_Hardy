@@ -114,7 +114,7 @@ public class MovementComponent : MonoBehaviour
     private bool TryMove(Vector3 direction)
     {
         var hits = Physics.CapsuleCastAll(transform.position, transform.position + Vector3.up * playerHeight, playerWidth, direction, movementDistance);
-
+ 
         //Limit nesting it makes it hard to follow what's going on 
         if (hits.Length >= 1)
         {
